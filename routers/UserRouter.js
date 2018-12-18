@@ -24,7 +24,7 @@ UserRouter.post('/', (req,res) => {
 
 //R
 UserRouter.get('/', (req,res) => {
-    
+
 
     UserModel.find({}, {password: 0}, (err, users) => {
         if(err) res.status(500).json({ success: 0, error: err });
