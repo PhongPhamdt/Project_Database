@@ -2,9 +2,7 @@ const express = require('express');
 const UserRouter = express.Router();
 const bcrypt = require('bcrypt-nodejs');
 const pg = require('pg');
-const connectionString = 'postgres://txscvdqw:GOIvHfhME7n90yjjngUHGOogp-3FZI64@baasu.db.elephantsql.com:5432/txscvdqw';
-const parse = require('pg-connection-string').parse;
-const config = parse(connectionString);
+const config = require('./config');
 const pool = new pg.Pool(config);
 
 UserRouter.post('/', (req,res) => {
@@ -12,7 +10,7 @@ UserRouter.post('/', (req,res) => {
     pool.connect((err, client) => {
         if (err) res.status(500).json({ success: 0, error: err});
         else {
-            client.query(`INSERT INTO "user" VALUES()`, (err,result) => {
+            client.query(``, (err,result) => {
                 if (err) res.status(500).json({ success: 2, error: err});
                 else res.status(201).json({ success: 1, user: result});
                 client.end();
@@ -24,20 +22,42 @@ UserRouter.post('/', (req,res) => {
 
 //R
 UserRouter.get('/', (req,res) => {
-
-
-    UserModel.find({}, {password: 0}, (err, users) => {
-        if(err) res.status(500).json({ success: 0, error: err });
-        else res.json({ success: 1, user: users });
+    pool.connect((err, client) => {
+        if (err) res.status(500).json({ success: 0, error: err});
+        else {
+            client.query(`SELECT * FROM "user"`, (err,result) => {
+                if (err) res.status(500).json({ success: 2, error: err});
+                else res.status(201).json({ success: 1, user: result.rows});
+                client.end();
+            });
+        }
+        pool.end();
     });
+
+    // UserModel.find({}, {password: 0}, (err, users) => {
+    //     if(err) res.status(500).json({ success: 0, error: err });
+    //     else res.json({ success: 1, user: users });
+    // });
 });
 //BTVN finish UD and getById
 UserRouter.get('/:id', (req, res) => {
-    UserModel.findOne({ _id: req.params.id }, (err, userFound) => {
-        if(err) res.status(500).json({ success: 0, error: err })
-        else res.status(200).json({ success: 1, user: userFound })
-    })
-})
+    pool.connect((err, client) => {
+        if (err) res.status(500).json({ success: 0, error: err});
+        else {
+            client.query(`SELECT * FROM "user"
+                            WHERE "userId" = ${req.params.id}`, (err,result) => {
+                if (err) res.status(500).json({ success: 2, error: err});
+                else res.status(201).json({ success: 1, user: result.rows});
+                client.end();
+            });
+        }
+        pool.end();
+    });
+    // UserModel.findOne({ _id: req.params.id }, (err, userFound) => {
+    //     if(err) res.status(500).json({ success: 0, error: err })
+    //     else res.status(200).json({ success: 1, user: userFound })
+    // })
+});
 
 UserRouter.put('/:id', (req, res) => {
     const {password, name} = req.body || {};

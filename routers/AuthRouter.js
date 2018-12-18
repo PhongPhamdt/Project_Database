@@ -2,9 +2,7 @@ const express = require('express');
 const AuthRouter = express.Router();
 const bcrypt = require('bcrypt-nodejs');
 const pg = require('pg');
-const connectionString = 'postgres://txscvdqw:GOIvHfhME7n90yjjngUHGOogp-3FZI64@baasu.db.elephantsql.com:5432/txscvdqw';
-const parse = require('pg-connection-string').parse;
-const config = parse(connectionString);
+const config = require('./config');
 const pool = new pg.Pool(config);
 
 AuthRouter.post('/login', (req,res) => {
@@ -15,8 +13,9 @@ AuthRouter.post('/login', (req,res) => {
             client.query(`SELECT * FROM "user"
                             WHERE "username" = '${username}'`, (err,result) => {
                 if (err) res.status(500).json({ success: 2, error: err});
-                else if(!result) res.status(404).json({ success: 3, error: "User not found"});
+                else if(!result.rows.username) res.status(404).json({ success: 3, error: "User not found"});
                 else {
+                    // console.log(result.rows);
                     if (password === result.rows[0].password) {
                         req.session.user = {userId: result.rows[0].userId};
                         res.json({success: 1, message: "Login Successful"});
