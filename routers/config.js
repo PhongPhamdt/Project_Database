@@ -1,4 +1,4 @@
-const connectionString = 'postgres://txscvdqw:GOIvHfhME7n90yjjngUHGOogp-3FZI64@baasu.db.elephantsql.com:5432/txscvdqw';
+const connectionString = 'postgres://txscvdqw:tU0QoRhdKP_X1D6zekT1QZZJOI6ghJS2@baasu.db.elephantsql.com:5432/txscvdqw';
 const parse = require('pg-connection-string').parse;
 const config = parse(connectionString);
 

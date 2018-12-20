@@ -15,7 +15,7 @@ UserRouter.post('/', (req,res) => {
                 done();
                 if (err) res.status(500).json({ success: 2, error: err});
                 else res.status(201).json({ success: 1, user: result});
-                client.end();
+                // client.end();
             });
         }
         // pool.end();
@@ -31,7 +31,7 @@ UserRouter.get('/', (req,res) => {
                 done();
                 if (err) res.status(500).json({ success: 2, error: err});
                 else res.status(201).json({ success: 1, user: result.rows});
-                client.end();
+                // client.end();
             });
         }
         // pool.end();
@@ -47,7 +47,7 @@ UserRouter.get('/:id', (req, res) => {
                 done();
                 if (err) res.status(500).json({ success: 2, error: err});
                 else res.status(201).json({ success: 1, user: result.rows});
-                client.end();
+                // client.end();
             });
         }
         // pool.end();
@@ -58,41 +58,40 @@ UserRouter.put('/:id', (req, res) => {
     const {password, name, avatarUrl, gender} = req.body || {};
     const userId = req.params.id;
 
+    if(password) {
+        pool.connect((err, client, done) => {
+            if (err) res.status(500).json({success: 0, error: err});
+            else {
+                client.query(`UPDATE "user" set password = '${password}' WHERE ("userId" = ${userId})`, (err, result) => {
+                    done();
+                    if (err) res.status(500).json({success: 2, error: err});
+                    else res.status(201).json({success: 1, user: result.rows});
+                    // client.end();
+                });
+            }
+            // pool.end();
+        });
+    }
+});
+
+UserRouter.delete('/:id', (req,res) => {
+    const userId = req.params.id;
+
     pool.connect((err, client, done) => {
-        if (err) res.status(500).json({ success: 0, error: err});
+        if (err) res.status(500).json({success: 0, error: err});
         else {
-            client.query(``, (err,result) => {
+            client.query(`UPDATE "user" set password = '${password}' WHERE ("userId" = ${userId})`, (err, result) => {
                 done();
-                if (err) res.status(500).json({ success: 2, error: err});
-                else res.status(201).json({ success: 1, user: result.rows});
-                client.end();
+                if (err) res.status(500).json({success: 2, error: err});
+                else res.status(201).json({success: 1, user: result.rows});
+                // client.end();
             });
         }
         // pool.end();
     });
-    // UserModel.findById(
-    //     userId,
-    //     (err, userFound) => {
-    //         if (err) res.status(500).json({ success: 0, error: err });
-    //         else if(!userFound) res.status(404).json({ success: 0, error: "No such user"});
-    //         else {
-    //             const userChange = {password, name};
-    //             for(key in userChange) {
-    //                 if(userChange[key] !== null && userChange[key] !== undefined)
-    //                     userFound[key] = userChange[key];
-    //             }
-    //             userFound.save((err, userUpdated) =>{
-    //                 if (err) res.status(500).json({ success: 0, error: err });
-    //                 else res.send({ success: 1, user: userUpdated });
-    //             });
-    //         }
-    //     });
-});
-
-UserRouter.delete('/:id', (req,res) => {
-    UserModel.findByIdAndRemove({ _id: req.params.id }).then(userDeleted=>{
-        res.status(200).json({ success: 1, user: userDeleted })
-    });
+    // UserModel.findByIdAndRemove({ _id: req.params.id }).then(userDeleted=>{
+    //     res.status(200).json({ success: 1, user: userDeleted })
+    // });
 });
 
 

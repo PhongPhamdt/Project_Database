@@ -14,7 +14,7 @@ AuthRouter.post('/login', (req,res) => {
                             WHERE "username" = '${username}'`, (err,result) => {
                 done();
                 if (err) res.status(500).json({ success: 2, error: err});
-                else if(!result.rows.username) res.status(404).json({ success: 3, error: "User not found"});
+                else if(!result.rows[0].username) res.status(404).json({ success: 3, error: "User not found"});
                 else {
                     // console.log(result.rows);
                     if (password === result.rows[0].password) {
@@ -22,7 +22,7 @@ AuthRouter.post('/login', (req,res) => {
                         res.json({success: 1, message: "Login Successful"});
                     } else res.status(401).json({ success: 0, error: "Wrong password"});
                 }
-                client.end();
+                // client.end();
             });
         }
         // pool.end();
@@ -45,7 +45,7 @@ AuthRouter.post('/login', (req,res) => {
 
 AuthRouter.delete('/logout', (req,res) => {
     req.session.destroy();
-    pool.end();
+    // pool.end();
     res.send({ success: 1, message:"Logout successfully"});
     // pool.end();
 });
