@@ -7,11 +7,12 @@ const pool = new pg.Pool(config);
 
 AuthRouter.post('/login', (req,res) => {
     const { username, password } = req.body;
-    pool.connect((err, client) => {
+    pool.connect((err, client, done) => {
         if (err) res.status(500).json({ success: 0, error: err});
         else {
             client.query(`SELECT * FROM "user"
                             WHERE "username" = '${username}'`, (err,result) => {
+                done();
                 if (err) res.status(500).json({ success: 2, error: err});
                 else if(!result.rows.username) res.status(404).json({ success: 3, error: "User not found"});
                 else {
@@ -24,7 +25,7 @@ AuthRouter.post('/login', (req,res) => {
                 client.end();
             });
         }
-        pool.end();
+        // pool.end();
     });
 
     // UserSchema.findOne({ username }, (err, userFound) => {
@@ -44,7 +45,9 @@ AuthRouter.post('/login', (req,res) => {
 
 AuthRouter.delete('/logout', (req,res) => {
     req.session.destroy();
+    pool.end();
     res.send({ success: 1, message:"Logout successfully"});
+    // pool.end();
 });
 
 module.exports = AuthRouter;
