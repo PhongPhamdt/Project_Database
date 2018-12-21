@@ -54,8 +54,8 @@ UserRouter.get('/:id', (req, res) => {
     });
 });
 
-UserRouter.put('/:id', (req, res) => {
-    const {password, name, avatarUrl, gender} = req.body || {};
+UserRouter.put('/:id/password', (req, res) => {
+    const {password} = req.body || {};
     const userId = req.params.id;
 
     if(password) {
@@ -65,14 +65,35 @@ UserRouter.put('/:id', (req, res) => {
                 client.query(`UPDATE "user" set password = '${password}' WHERE ("userId" = ${userId})`, (err, result) => {
                     done();
                     if (err) res.status(500).json({success: 2, error: err});
+                    else res.status(201).json({success: 1, user: result});
+                    // client.end();
+                });
+            }
+        });
+    }
+});
+
+UserRouter.put('/:id/profile', (req, res) => {
+    const {name,avatarUrl,gender} = req.body || {};
+    const userId = req.params.id;
+    if (name||avatarUrl||gender) {
+        pool.connect((err, client, done) => {
+            if (err) res.status(500).json({success: 0, error: err});
+            else {
+                client.query(`UPDATE "user" set name = '${name}', 
+                                "avatarUrl" = '${avatarUrl}',
+                                gender = '${gender}' 
+                                WHERE ("userId" = ${userId})`, (err, result) => {
+                    done();
+                    if (err) res.status(500).json({success: 2, error: err});
                     else res.status(201).json({success: 1, user: result.rows});
                     // client.end();
                 });
             }
-            // pool.end();
         });
-    }
+    };
 });
+
 
 UserRouter.delete('/:id', (req,res) => {
     const userId = req.params.id;
@@ -80,7 +101,7 @@ UserRouter.delete('/:id', (req,res) => {
     pool.connect((err, client, done) => {
         if (err) res.status(500).json({success: 0, error: err});
         else {
-            client.query(`UPDATE "user" set password = '${password}' WHERE ("userId" = ${userId})`, (err, result) => {
+            client.query(`DELETE FROM "user" WHERE ("userId"=${userId})`, (err, result) => {
                 done();
                 if (err) res.status(500).json({success: 2, error: err});
                 else res.status(201).json({success: 1, user: result.rows});
