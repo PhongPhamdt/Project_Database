@@ -1,0 +1,31 @@
+{
+  "name": "project_database",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PhongPhamdt/Project_Database.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PhongPhamdt/Project_Database/issues"
+  },
+  "homepage": "https://github.com/PhongPhamdt/Project_Database#readme",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "formidable": "^1.2.1",
+    "path": "^0.12.7",
+    "pg": "^7.7.1",
+    "pg-connection-string": "^2.0.0"
+  }
+}
