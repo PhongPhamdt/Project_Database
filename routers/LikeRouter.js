@@ -1,19 +1,19 @@
 const express = require('express');
-const CommentRouter = express.Router();
+const LikeRouter = express.Router();
 const bcrypt = require('bcrypt-nodejs');
 const pg = require('pg');
 const config = require('./config');
 const pool = new pg.Pool(config);
 
-CommentRouter.post('/post_comment/:id/:iid', (req,res) => {
+LikeRouter.post('/like_image/:id/:iid', (req,res) => {
     const userId = req.params.id;
     const imageId = req.params.iid;
-    const {content} = req.body;
+    // const {content} = req.body;
     pool.connect((err, client, done) => {
         if (err) res.status(500).json({ success: 0, error: err});
         else {
-            client.query(`INSERT INTO "comment"("imageId","userId",content) 
-                            VALUES('${imageId}','${userId}','${content}');`, (err,result) => {
+            client.query(`INSERT INTO "like"("imageid","userId") 
+                            VALUES('${imageId}','${userId}');`, (err,result) => {
                 done();
                 if (err) res.status(500).json({ success: 2, error: err});
                 else res.status(201).json({ success: 1, user: result});
@@ -25,13 +25,13 @@ CommentRouter.post('/post_comment/:id/:iid', (req,res) => {
 });
 
 //R
-CommentRouter.get('/get_all_comments_of_an_image/:iid', (req,res) => {
+LikeRouter.get('/get_all_likes_of_an_image/:iid', (req,res) => {
     const imageId = req.params.iid;
     pool.connect((err, client, done) => {
         if (err) res.status(500).json({ success: 0, error: err});
         else {
-            client.query(`SELECT * FROM "comment"
-                            WHERE ("imageId"=${imageId});`, (err,result) => {
+            client.query(`SELECT * FROM "like"
+                            WHERE ("imageid"=${imageId});`, (err,result) => {
                 done();
                 if (err) res.status(500).json({ success: 2, error: err});
                 else res.status(201).json({ success: 1, user: result.rows});
@@ -42,12 +42,12 @@ CommentRouter.get('/get_all_comments_of_an_image/:iid', (req,res) => {
     });
 });
 //BTVN finish UD and getById
-CommentRouter.get('/get_all_comments_of_user/:id', (req, res) => {
+LikeRouter.get('/get_all_likes_of_user/:id', (req, res) => {
     const userId = req.params.id;
     pool.connect((err, client, done) => {
         if (err) res.status(500).json({ success: 0, error: err});
         else {
-            client.query(`SELECT * FROM "comment"
+            client.query(`SELECT * FROM "like"
                             WHERE ("userId"=${userId});`, (err,result) => {
                 done();
                 if (err) res.status(500).json({ success: 2, error: err});
@@ -59,7 +59,7 @@ CommentRouter.get('/get_all_comments_of_user/:id', (req, res) => {
     });
 });
 
-// CommentRouter.put('/:id', (req, res) => {
+// LikeRouter.put('/:id', (req, res) => {
 //     const {password} = req.body || {};
 //     const userId = req.params.id;
 //     if(password) {
@@ -77,7 +77,7 @@ CommentRouter.get('/get_all_comments_of_user/:id', (req, res) => {
 //     }
 // });
 
-// CommentRouter.put('/profile/:id', (req, res) => {
+// LikeRouter.put('/profile/:id', (req, res) => {
 //     const {name,avatarUrl,gender} = req.body || {};
 //     const userId = req.params.id;
 //     if (name||avatarUrl||gender) {
@@ -99,21 +99,22 @@ CommentRouter.get('/get_all_comments_of_user/:id', (req, res) => {
 // });
 
 
-// CommentRouter.delete('/:id', (req,res) => {
-//     const userId = req.params.id;
-//
-//     pool.connect((err, client, done) => {
-//         if (err) res.status(500).json({success: 0, error: err});
-//         else {
-//             client.query(`DELETE FROM "user" WHERE ("userId"=${userId})`, (err, result) => {
-//                 done();
-//                 if (err) res.status(500).json({success: 2, error: err});
-//                 else res.status(201).json({success: 1, user: result.rows});
-//                 // client.end();
-//             });
-//         }
-//         // pool.end();
-//     });
-// });
+LikeRouter.delete('/dislike/:id/:iid', (req,res) => {
+    const userId = req.params.id;
+    const imageId = req.params.iid;
+    pool.connect((err, client, done) => {
+        if (err) res.status(500).json({success: 0, error: err});
+        else {
+            client.query(`DELETE FROM "like" WHERE ("userId"=${userId}
+                                                    AND "imageid"=${imageId});`, (err, result) => {
+                done();
+                if (err) res.status(500).json({success: 2, error: err});
+                else res.status(201).json({success: 1, user: result.rows});
+                // client.end();
+            });
+        }
+        // pool.end();
+    });
+});
 
-module.exports = CommentRouter;
+module.exports = LikeRouter;
